@@ -24,12 +24,12 @@ namespace SpeedTest
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            //only run if framerate is greater than FPS value
+            //spawn more if framerate is greater than FPS value
             const float fps = 120f;
             var deltaTime = SystemAPI.Time.DeltaTime;
             if (deltaTime > 1f / fps) return;
 
-            //comment out entity manager and uncomment ecb lines to compare
+            //comment out EntityManager and uncomment ECB lines to compare
             //var ecb = new EntityCommandBuffer(Allocator.Temp);
             for (var i = 0; i < 1000; i++)
             {
@@ -44,16 +44,14 @@ namespace SpeedTest
     public partial struct SpeedTestAddSystem : ISystem
     {
         private EntityQuery _query;
-        private ComponentType _componentType;
         
+        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             var builder = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<SpeedTestEntityTag>()
                 .WithNone<SpeedTestRemovableEntityTag>();
             _query = state.GetEntityQuery(builder);
-
-            _componentType = typeof(SpeedTestRemovableEntityTag);
         }
 
         [BurstCompile]
@@ -90,7 +88,7 @@ namespace SpeedTest
 
             /*
             //Batched EntityManager Adder
-            state.EntityManager.AddComponent(_query, _componentType);
+            state.EntityManager.AddComponent<SpeedTestRemovableEntityTag>(_query);
             */
         }
     }
@@ -98,15 +96,13 @@ namespace SpeedTest
     public partial struct SpeedTestRemoveSystem : ISystem
     {
         private EntityQuery _query;
-        private ComponentType _componentType;
-        
+
+        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             var builder = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<SpeedTestEntityTag, SpeedTestRemovableEntityTag>();
             _query = state.GetEntityQuery(builder);
-            
-            _componentType = typeof(SpeedTestRemovableEntityTag);
         }
         
         [BurstCompile]
@@ -144,7 +140,7 @@ namespace SpeedTest
 
             /*
             //batched component removal
-            state.EntityManager.RemoveComponent(_query, _componentType);
+            state.EntityManager.RemoveComponent<SpeedTestRemovableEntityTag>(_query);
             */
         }
     }
